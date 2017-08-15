@@ -23,9 +23,31 @@ use yii\helpers\ArrayHelper;
 
 
     <?php
+    /*
+       1
         $psObjs = Poststatus::find()->all();
         $allStatus = ArrayHelper::map($psObjs,'id','name');
+2
+        $psArray = Yii::$app->db->createCommand('select id,name from poststatus')->queryAll();
+        $allStatus = ArrayHelper::map($psArray,'id','name');
+
+3
+        $allStatus =  (new \yii\db\Query())
+                ->select(['name','id'])
+                ->from('poststatus')
+                ->indexBy('id')
+                ->column();
+
+    */
+
+        $allStatus = Poststatus::find()
+            ->select(['name'])
+            ->orderBy('position')
+            ->indexBy('id')
+            ->column();
+
     ?>
+
 
     <?= $form -> field($model,'status')
         -> dropDownList($allStatus,['prompt'=>'请选择状态']);
@@ -35,8 +57,19 @@ use yii\helpers\ArrayHelper;
 
     <?= $form->field($model, 'update_time')->textInput() ?>
 
-    <?= $form->field($model, 'author_id')->textInput() ?>
+<!--    --><?//= $form->field($model, 'author_id')->textInput() ?>
 
+    <?php
+
+        $allStatus = \common\models\Adminuser::find()
+                ->select('nickname')
+
+                ->indexBy('id')
+                ->column();
+
+
+    ?>
+    <?= $form ->field($model,'author_id')->dropDownList($allStatus,['prompt'=>'请选择作者']);   ?>
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? '添加' : '修改', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
